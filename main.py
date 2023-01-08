@@ -8,4 +8,4 @@ from flask_app.routers import web_app
 
 if __name__ == '__main__':
 
-    web_app.run(debug=True, port=8000)
+    web_app.run()
