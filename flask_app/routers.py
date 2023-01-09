@@ -12,17 +12,17 @@ config = dict(read_config()).get("PARAMETERS")
 
 
 # Initialize flask app
-web_app = Flask(__name__)
+app = Flask(__name__)
 
 # Handle GET request
-@web_app.route('/', methods=['GET'])
+@app.route('/', methods=['GET'])
 def drawing():
     global config 
     html_template_path = config.get("html_template_path")
     return render_template(html_template_path)
 
 # Handle POST request
-@web_app.route('/', methods=['POST'])
+@app.route('/', methods=['POST'])
 def canvas():
     global config 
     html_template_path = config.get("html_template_path")
