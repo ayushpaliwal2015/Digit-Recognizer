@@ -1,3 +1,3 @@
 runtime: python310
 env: flex
-entrypoint: gunicorn -b :$PORT main:app --timeout 1800
+entrypoint: gunicorn -b :$PORT main:app 
