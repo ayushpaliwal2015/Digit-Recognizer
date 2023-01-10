@@ -8,6 +8,7 @@ from keras.models import model_from_json
 import os
 from tensorflow.keras.layers import BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
 
 class TrainCNN:
     # Collect the model training hyperparameters 
@@ -38,8 +39,8 @@ class TrainCNN:
         self.x_test /= 255
 
         # Convert Labels to categorical type
-        self.y_train = keras.utils.to_categorical(self.y_train, self.n_class)
-        self.y_test = keras.utils.to_categorical(self.y_test, self.n_class)
+        self.y_train = keras.utils.np_utils.to_categorical(self.y_train, self.n_class)
+        self.y_test = keras.utils.np_utils.to_categorical(self.y_test, self.n_class)
 
     # Data augmentation to prevent overfitting
     def augment_data(self):
@@ -83,7 +84,7 @@ class TrainCNN:
         self.model.add(Flatten())
         self.model.add(Dense(512, activation = 'relu'))
         self.model.add(Dense(self.n_class, activation = 'softmax'))
-        self.model.compile(loss = keras.losses.categorical_crossentropy, optimizer = keras.optimizers.Adam(), metrics = ['accuracy'])
+        self.model.compile(loss = keras.losses.categorical_crossentropy, optimizer = tf.keras.optimizers.Adam(), metrics = ['accuracy'])
         self.model.summary()
 
     # Training the Model
