@@ -15,7 +15,7 @@
 ***
 
 
-<h3 align="center"> <i>You Can draw a digit with the cursor on this <a href="http://100.24.205.211/"> page </a> </i> </h3>
+<h3 align="center"> <i>You can draw a digit with the cursor on this <a href="http://100.24.205.211/"> page </a> </i> </h3>
 </br>
 
 <p align="center"><img width="960" alt="image" src="https://user-images.githubusercontent.com/19925326/211682398-c1a88213-4499-4af5-a7b3-9ccdef83dc18.png"></p>
