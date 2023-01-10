@@ -3,6 +3,8 @@
 ## Upgrade pip              ## pip install --upgrade pip
 ## Install dependencies     ## pip install -r requirements.txt
 ## If Python isn't on your Windows path, you may need to type out the full path to pyinstaller to get it to run.
+## AWS EC2: ssh -i "ec2_key_dig_rec.pem" ubuntu@ec2-34-201-251-31.compute-1.amazonaws.com
+## 
 
 from flask import Flask, render_template, request
 import numpy as np
