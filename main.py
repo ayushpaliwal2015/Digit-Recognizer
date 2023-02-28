@@ -15,9 +15,11 @@ import tensorflow as tf
 from model.train import TrainCNN
 from helpers.functions import read_config
 
-# Load config
+# Load config 
 config = dict(read_config()).get("PARAMETERS")
 
+# Train or load CNN model
+cnn_model = TrainCNN(config).load_or_train_model()
 
 # Initialize flask app
 app = Flask(__name__)
@@ -31,15 +33,11 @@ def drawing():
 
 # Handle POST request
 @app.route('/', methods=['POST'])
-def canvas():
+def canvas(model = cnn_model):
     global config 
     html_template_path = config.get("html_template_path")
     img_cols = int(config.get("img_cols"))
     img_rows = int(config.get("img_rows"))
-
-    # Train or load CNN model
-    train_cnn = TrainCNN(config)
-    model = train_cnn.load_or_train_model()
 
     # Recieve base64 data from the user form
     canvasdata = request.form['canvasimg']
