@@ -16,10 +16,11 @@ from model.train import TrainCNN
 from helpers.functions import read_config
 
 # Load config 
-config = dict(read_config()).get("PARAMETERS")
+config = read_config().get("PARAMETERS")
 
 # Train or load CNN model
-cnn_model = TrainCNN(config).load_or_train_model()
+CNN = TrainCNN(config)
+cnn_model = CNN.load_or_train_model()
 
 # Initialize flask app
 app = Flask(__name__)

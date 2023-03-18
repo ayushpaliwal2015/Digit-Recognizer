@@ -1,3 +1,0 @@
-runtime: python310
-env: flex
-entrypoint: gunicorn -b :$PORT main:app 

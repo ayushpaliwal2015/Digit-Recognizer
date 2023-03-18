@@ -13,7 +13,7 @@ import tensorflow as tf
 class TrainCNN:
     # Collect the model training hyperparameters 
     def __init__(self, config):
-        self.train_config = config
+        self.config = config
         self.n_class = 10
 
     # Loading the data
@@ -22,8 +22,8 @@ class TrainCNN:
 
     # Preparing the data
     def process_data(self):
-        img_cols = int(self.train_config.get("img_cols"))
-        img_rows = int(self.train_config.get("img_rows"))
+        img_cols = int(self.config.get("img_cols"))
+        img_rows = int(self.config.get("img_rows"))
 
         # Reshape data to have a single channel 
         self.x_train = self.x_train.reshape(-1, img_rows, img_cols, 1)
@@ -44,11 +44,11 @@ class TrainCNN:
 
     # Data augmentation to prevent overfitting
     def augment_data(self):
-        batch_size = int(self.train_config.get("batch_size"))
-        rotation_range = int(self.train_config.get("rotation_range"))
-        zoom_range = float(self.train_config.get("zoom_range"))
-        width_shift_range = float(self.train_config.get("width_shift_range"))
-        height_shift_range = float(self.train_config.get("height_shift_range"))
+        batch_size = int(self.config.get("batch_size"))
+        rotation_range = int(self.config.get("rotation_range"))
+        zoom_range = float(self.config.get("zoom_range"))
+        width_shift_range = float(self.config.get("width_shift_range"))
+        height_shift_range = float(self.config.get("height_shift_range"))
 
         data_gen = ImageDataGenerator(
                 featurewise_center = False,             # set input mean to 0 over the dataset
@@ -89,27 +89,27 @@ class TrainCNN:
 
     # Training the Model
     def train_cnn_model(self):
-        batch_size = int(self.train_config.get("batch_size"))
-        epochs = int(self.train_config.get("epochs"))
+        batch_size = int(self.config.get("batch_size"))
+        epochs = int(self.config.get("epochs"))
 
         train_steps = self.x_train.shape[0] // batch_size
         valid_steps = self.x_test.shape[0] // batch_size
 
         es = keras.callbacks.EarlyStopping(
-                monitor = "accuracy",   # metrics to monitor
-                patience = 2,           # how many epochs before stop
-                verbose = 1,
-                mode = "max",           # we need the maximum accuracy.
-                restore_best_weights = True, 
+                monitor = "accuracy",           # metrics to monitor
+                patience = 3,                   # how many epochs before stop training
+                verbose = 1,                    # provide update messages
+                mode = "max",                   # to stop training if accuracy does not improve
+                restore_best_weights = True,    # restore best weights after training
             )
 
         rp = keras.callbacks.ReduceLROnPlateau(
-                monitor="accuracy",
-                factor = 0.2,
-                patience = 2,
-                verbose = 1,
-                mode = "max",
-                min_lr = 0.00001,
+                monitor = "accuracy",           # metrics to monitor
+                factor = 0.2,                   # lr shrinkage factor
+                patience = 2,                   # lr reducing epoch patience
+                verbose = 1,                    # provide update messages
+                mode = "max",                   # to reduce lr if accuracy does not improve
+                min_lr = 0.00001,               # lower limit of lr
             )
 
         self.model.fit(self.train_gen, 
@@ -129,8 +129,8 @@ class TrainCNN:
 
     # Saving the model for Future Inferences
     def save_cnn_model(self):
-        json_model_path = self.train_config.get("json_model_path")
-        h5_model_path = self.train_config.get("h5_model_path")
+        json_model_path = self.config.get("json_model_path")
+        h5_model_path = self.config.get("h5_model_path")
 
         model_json = self.model.to_json()
         with open(json_model_path, "w") as json_file:
@@ -142,7 +142,7 @@ class TrainCNN:
     # Open and load model files 
     def load_saved_model(self):
         # opening and store file in a variable
-        json_model_path = self.train_config.get("json_model_path")
+        json_model_path = self.config.get("json_model_path")
         json_file = open(json_model_path,'r')
         loaded_model_json = json_file.read()
         json_file.close()
@@ -151,7 +151,7 @@ class TrainCNN:
         loaded_model = model_from_json(loaded_model_json)
 
         # load weights into new model
-        h5_model_path = self.train_config.get("h5_model_path")
+        h5_model_path = self.config.get("h5_model_path")
         loaded_model.load_weights(h5_model_path)
 
         # compile and evaluate loaded model
@@ -161,12 +161,12 @@ class TrainCNN:
     # Delete model dump files if exist
     def remove_model_files(self):
         try:
-            os.remove(self.train_config.get("h5_model_path"))
+            os.remove(self.config.get("h5_model_path"))
         except OSError:
             pass
 
         try:
-            os.remove(self.train_config.get("json_model_path"))
+            os.remove(self.config.get("json_model_path"))
         except OSError:
             pass
 
@@ -183,7 +183,7 @@ class TrainCNN:
     # Load a model if exists else train a new one
     def load_or_train_model(self):
 
-        if os.path.exists(self.train_config.get("h5_model_path")) and os.path.exists(self.train_config.get("json_model_path")):
+        if os.path.exists(self.config.get("h5_model_path")) and os.path.exists(self.config.get("json_model_path")):
             self.load_saved_model()
         else:
             self.remove_model_files()
