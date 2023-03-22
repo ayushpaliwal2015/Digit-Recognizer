@@ -9,6 +9,8 @@ import os
 from tensorflow.keras.layers import BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
+from helpers.functions import load_csv_data
+import numpy as np
 
 class TrainCNN:
     # Collect the model training hyperparameters 
@@ -16,9 +18,22 @@ class TrainCNN:
         self.config = config
         self.n_class = 10
 
+    # Load external data from csv
+    def load_external_data(self):
+        (self.x_train, self.y_train) = load_csv_data(self.config.get("train_data_path"))
+        (self.x_test, self.y_test)   = load_csv_data(self.config.get("test_data_path"))
+
+    # Load Keras data
+    def load_keras_data(self):
+        (self.x_train, self.y_train), (self.x_test, self.y_test) = mnist.load_data()
+
     # Loading the data
     def load_data(self):
-        (self.x_train, self.y_train), (self.x_test, self.y_test) = mnist.load_data()
+        use_external_data = bool(int(self.config.get("use_external_data")))
+        if use_external_data:
+            self.load_external_data()
+        else:
+            self.load_keras_data()
 
     # Preparing the data
     def process_data(self):
@@ -46,7 +61,8 @@ class TrainCNN:
     def augment_data(self):
         batch_size = int(self.config.get("batch_size"))
         rotation_range = int(self.config.get("rotation_range"))
-        zoom_range = float(self.config.get("zoom_range"))
+        zoom_range = self.config.get("zoom_range")
+        zoom_range = list(map(float, zoom_range.split(",")))
         width_shift_range = float(self.config.get("width_shift_range"))
         height_shift_range = float(self.config.get("height_shift_range"))
 
@@ -124,8 +140,6 @@ class TrainCNN:
     # Evaluating the Predictions on the Test data
     def evaluate_cnn_model(self):
         score = self.model.evaluate(self.x_test, self.y_test, verbose = 0)
-        print('Test loss:', score[0])
-        print('Test accuracy:', score[1])
 
     # Saving the model for Future Inferences
     def save_cnn_model(self):
