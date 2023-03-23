@@ -61,8 +61,7 @@ class TrainCNN:
     def augment_data(self):
         batch_size = int(self.config.get("batch_size"))
         rotation_range = int(self.config.get("rotation_range"))
-        zoom_range = self.config.get("zoom_range")
-        zoom_range = list(map(float, zoom_range.split(",")))
+        zoom_range = float(self.config.get("zoom_range"))
         width_shift_range = float(self.config.get("width_shift_range"))
         height_shift_range = float(self.config.get("height_shift_range"))
 
@@ -98,7 +97,7 @@ class TrainCNN:
         self.model.add(MaxPooling2D(pool_size = (2, 2)))
         self.model.add(BatchNormalization())
         self.model.add(Flatten())
-        self.model.add(Dense(128, activation = 'relu'))
+        self.model.add(Dense(512, activation = 'relu'))
         self.model.add(Dense(self.n_class, activation = 'softmax'))
         self.model.compile(loss = keras.losses.categorical_crossentropy, optimizer = tf.keras.optimizers.Adam(), metrics = ['accuracy'])
         self.model.summary()
