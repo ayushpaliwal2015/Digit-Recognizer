@@ -18,7 +18,7 @@
 <h3 align="center"> <i>You can draw a digit using cursor on this <a href="http://100.24.205.211/"> page </a> </i> </h3>
 </br>
 
-<p align="center"><img width="960" alt="image" src="https://user-images.githubusercontent.com/19925326/211682398-c1a88213-4499-4af5-a7b3-9ccdef83dc18.png"></p>
+<img width="959" alt="Screenshot 2023-03-22 195756" src="https://user-images.githubusercontent.com/19925326/227066595-10b37cf6-40d6-4b09-b47f-29e9eb8ccb10.png">
 
 <h3 align="center"><b>Show your support by Starring this Repo</b></h3>
 
