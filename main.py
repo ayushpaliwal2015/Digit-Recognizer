@@ -11,7 +11,7 @@ import numpy as np
 from model.train import TrainCNN
 from helpers.functions import read_config, parse_image_data_from_request, save_user_input_data
 import tensorflow as tf
-
+import os
 
 # Load config 
 config = read_config().get("PARAMETERS")
@@ -21,6 +21,11 @@ img_rows = int(config.get("img_rows"))
 html_template_feedback_path = config.get("html_template_feedback_path")
 html_template_path = config.get("html_template_path")
 external_data_path = config.get("external_data_path")
+
+
+# Make 'data' directory to store user input data
+if not os.path.exists(external_data_path):
+    os.makedirs(external_data_path)
 
 
 # Train or load CNN model

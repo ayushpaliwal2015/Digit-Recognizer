@@ -67,7 +67,7 @@ def save_user_input_data(external_data_path, img, user_input):
 
     # Make file name out of timestamp
     file_name = str(time_epoch_now_ms) + ".json"
-    file_path = external_data_path + file_name
+    file_path = external_data_path + "/" + file_name
 
     # Store user data in dict
     user_data = {"img_array": img.tolist()[0], "img_label": int(user_input)}
