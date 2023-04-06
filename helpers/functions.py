@@ -4,6 +4,7 @@ import cv2
 import base64
 import time
 import json
+import os
 
 config_file_path = "./config.ini"
 
@@ -14,22 +15,21 @@ def read_config():
     return dict(config)
 
 
-# Load external data from csv
-def load_csv_data(file_path):
+# Load external data (user input data) from jsons
+def load_external_data(folder_path):
 
     data = []
     labels = []
     
-    for row in open(file_path): # Openfile and start reading each row
-        row = row.split(",")
+    for file_name in os.listdir(folder_path):
+
+        file_path = os.path.join(folder_path, file_name)
+        with open(file_path, 'r') as f:
+            input_data = json.load(f)
+
+        data.append(input_data.get("img_array"))
         
-        label = int(row[0])     
-        
-        image = np.array([int(x) for x in row[1:]], dtype="uint8")
-        image = image.reshape((28, 28))
-        data.append(image)
-        
-        labels.append(label)
+        labels.append(input_data.get("img_label"))
         
     data = np.array(data, dtype='float32')
     labels = np.array(labels, dtype="int")
@@ -70,9 +70,21 @@ def save_user_input_data(external_data_path, img, user_input):
     file_path = external_data_path + file_name
 
     # Store user data in dict
-    user_data = {"img_array": img.tolist(), "input_value": int(user_input)}
+    user_data = {"img_array": img.tolist()[0], "img_label": int(user_input)}
 
     # Save the dictionary as a JSON file
     with open(file_path, "w") as f:
         json.dump(user_data, f)
 
+def train_test_data_split(X, y, split_fraction):
+
+    # split the array into training and testing sets
+    split_idx = int(split_fraction * X.shape[0])
+
+    X_train = X[:split_idx]
+    y_train = y[:split_idx]
+
+    X_test = X[split_idx:]
+    y_test = y[split_idx:]
+
+    return (X_train, y_train), (X_test, y_test)

@@ -9,7 +9,7 @@ import os
 from tensorflow.keras.layers import BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
-from helpers.functions import load_csv_data
+from helpers.functions import load_external_data, train_test_data_split
 import numpy as np
 
 class TrainCNN:
@@ -20,8 +20,12 @@ class TrainCNN:
 
     # Load external data from csv
     def load_external_data(self):
-        (self.x_train, self.y_train) = load_csv_data(self.config.get("train_data_path"))
-        (self.x_test, self.y_test)   = load_csv_data(self.config.get("test_data_path"))
+
+        external_data_path = self.config.get("external_data_path")
+        (x_ext, y_ext) = load_external_data(external_data_path)
+
+        train_test_split_fraction = float(self.config.get("train_test_split_fraction"))
+        (self.x_train_ext, self.y_train_ext), (self.x_test_ext, self.y_test_ext) = train_test_data_split(x_ext, y_ext, train_test_split_fraction)
 
     # Load Keras data
     def load_keras_data(self):
@@ -29,11 +33,19 @@ class TrainCNN:
 
     # Loading the data
     def load_data(self):
+                
+        self.load_keras_data()
+
         use_external_data = bool(int(self.config.get("use_external_data")))
         if use_external_data:
+
             self.load_external_data()
-        else:
-            self.load_keras_data()
+
+            self.x_train = np.concatenate((self.x_train, self.x_train_ext), axis=0)
+            self.y_train = np.concatenate((self.y_train, self.y_train_ext), axis=0)
+            self.x_test = np.concatenate((self.x_test, self.x_test_ext), axis=0)
+            self.y_test = np.concatenate((self.y_test, self.y_test_ext), axis=0)
+
 
     # Preparing the data
     def process_data(self):
