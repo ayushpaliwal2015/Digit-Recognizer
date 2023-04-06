@@ -8,54 +8,76 @@
 
 from flask import Flask, render_template, request
 import numpy as np
-import base64
-import cv2
+from model.train import TrainCNN
+from helpers.functions import read_config, parse_image_data_from_request, save_user_input_data
 import tensorflow as tf
 
-from model.train import TrainCNN
-from helpers.functions import read_config
 
 # Load config 
 config = read_config().get("PARAMETERS")
+
+img_cols = int(config.get("img_cols"))
+img_rows = int(config.get("img_rows"))
+html_template_feedback_path = config.get("html_template_feedback_path")
+html_template_path = config.get("html_template_path")
+external_data_path = config.get("external_data_path")
+
 
 # Train or load CNN model
 CNN = TrainCNN(config)
 cnn_model = CNN.load_or_train_model()
 
+
 # Initialize flask app
 app = Flask(__name__)
 
-# Handle GET request
+
+# Handle GET request With Feedback
+@app.route('/feedback', methods=['GET'])
+def get_drawing_feedback():
+    global html_template_feedback_path 
+    return render_template(html_template_feedback_path)
+
+
+# Handle POST With Feedback request
+@app.route('/feedback', methods=['POST'])
+def post_canvas_prediction_feedback(model = cnn_model):
+    global html_template_feedback_path, img_cols, img_rows, external_data_path
+
+    # Revieve user input 
+    user_input = request.form['input']
+
+    # Parse image data from request to get an image
+    canvasdata, img = parse_image_data_from_request(request, img_rows, img_cols)
+
+    # Save image and user input ONLY if we recieve user input
+    if user_input:
+        save_user_input_data(external_data_path, img, user_input)
+
+    # Scale image 
+    img = tf.constant(img)/255
+
+    try:
+        prediction = np.argmax(model.predict(img))
+        return render_template(html_template_feedback_path, response=str(prediction), canvasdata=canvasdata, success=True)
+    except Exception as e:
+        return render_template(html_template_feedback_path, response=str(e), canvasdata=canvasdata)
+
+
+# Handle GET request Without Feedback
 @app.route('/', methods=['GET'])
-def drawing():
-    global config 
-    html_template_path = config.get("html_template_path")
+def get_drawing():
+    global html_template_path 
     return render_template(html_template_path)
 
-# Handle POST request
+
+# Handle POST request Without Feedback
 @app.route('/', methods=['POST'])
-def canvas(model = cnn_model):
-    global config 
-    html_template_path = config.get("html_template_path")
-    img_cols = int(config.get("img_cols"))
-    img_rows = int(config.get("img_rows"))
+def post_canvas_prediction(model = cnn_model):
+    global html_template_path, img_cols, img_rows
 
-    # Recieve base64 data from the user form
-    canvasdata = request.form['canvasimg']
-    encoded_data = request.form['canvasimg'].split(',')[1]
-
-    # Decode base64 image to python array
-    nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-    # Convert 3 channel image (RGB) to 1 channel image (GRAY)
-    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Resize to (28, 28)
-    gray_image = cv2.resize(gray_image, (img_rows, img_cols), interpolation=cv2.INTER_LINEAR)
-
-    # Expand to numpy array dimenstion to (28, 28, 1)
-    img = np.expand_dims(gray_image, axis = 0)
+    # Parse image data from request to get an image
+    canvasdata, img = parse_image_data_from_request(request, img_rows, img_cols)
 
     # Scale image 
     img = tf.constant(img)/255
@@ -65,6 +87,7 @@ def canvas(model = cnn_model):
         return render_template(html_template_path, response=str(prediction), canvasdata=canvasdata, success=True)
     except Exception as e:
         return render_template(html_template_path, response=str(e), canvasdata=canvasdata)
+
 
 if __name__ == '__main__':
     app.run()

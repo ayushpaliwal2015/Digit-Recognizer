@@ -14,6 +14,28 @@
             width: 280px;
             border-radius: 0px;
         }
+        .dialog {
+			position: fixed;
+			bottom: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			padding: 6px;
+			background-color: rgb(19, 189, 236);
+			color: white;
+            align-items: center;
+			max-width: 280px; 
+			width: 100%;
+		}
+        .dialog label {
+			margin-right: 30px; 
+            margin-left: 30px;
+        }
+		.dialog input {
+			padding: 5px 20px;
+			border-radius: 5px;
+			border: 1px solid rgb(19, 189, 236);
+			background-color: #f5f5f5;
+		}
     </style>
 </head>
 <body>
@@ -22,20 +44,20 @@
             Draw a Digit Between 0 and 9 on Canvas <a href="https://github.com/ayushpaliwal2015/Digit_Recognizer"> (Link to project)</a>
           </span></div>
     </nav>
-    {% if response %}
-        {% if success %}
+
+        {% if response %}
             <p class="alert alert-success m-4 text-center">Prediction Result : {{ response }}</p>
         {% else %}
-            <p class="alert alert-success m-4 text-center">{{ response }}</p>
+            <p class="alert alert-success m-4 text-center">Prediction Results</p>
         {% endif %}
-    {% endif %}
+
     <div class="container mt-4">
         <div class="row" style="width: 280px; margin: auto; border-radius: 0px;">
             <div class="tools d-flex justify-content-between">
                 <button class="btn btn-danger" id="clear">Clear</button>
             </div>
         </div>
-        <form action="/" method="POST" onsubmit="canvastoimage()">
+        <form action="/feedback" method="POST" onsubmit="canvastoimage()">
             <div class="row">
                 <div class="col d-flex justify-content-center">
                     <input type="hidden" id="canvasimg" name="canvasimg">
@@ -47,6 +69,11 @@
                 <div class="col d-flex justify-content-center">
                     <button style="width: 280px; margin: auto; border-radius: 0px;" class="btn btn-success" id="send" type="submit">Detect Number</button>
                 </div>
+            </div>
+            
+        	<div class="dialog">
+                <label for="input">User Response</label>
+                <input type="number" id="input" name="input" min="0" max="9">
             </div>
         </form>
     </div>
@@ -113,6 +140,7 @@
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
             });
+
         });
 
         // Canvas Submit
