@@ -46,10 +46,7 @@ def parse_image_data_from_request(request, img_rows, img_cols):
 
     # Decode base64 image to python array
     nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-    # Convert 3 channel image (RGB) to 1 channel image (GRAY)
-    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray_image = cv2.imdecode(nparr, 0)
 
     # Resize to (28, 28)
     gray_image = cv2.resize(gray_image, (img_rows, img_cols), interpolation=cv2.INTER_LINEAR)
