@@ -16,7 +16,6 @@
         }
         .dialog {
 			position: fixed;
-			bottom: 10px;
 			left: 50%;
 			transform: translateX(-50%);
 			padding: 6px;
@@ -70,10 +69,11 @@
                     <button style="width: 280px; margin: auto; border-radius: 0px;" class="btn btn-success" id="send" type="submit">Detect Number</button>
                 </div>
             </div>
-            
-        	<div class="dialog">
-                <label for="input">User Response</label>
-                <input type="number" id="input" name="input" min="0" max="9">
+            <div class="row">
+                <div class="dialog">
+                    <label for="input">User Response</label>
+                    <input type="number" id="input" name="input" min="0" max="9">
+                </div>
             </div>
         </form>
     </div>
